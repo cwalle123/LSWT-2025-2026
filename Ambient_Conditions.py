@@ -1,4 +1,5 @@
-"""This file is used to find the ambient conditions in the wind tunnel for further calculations in other files"""
+"""This file is used to find the ambient conditions in the wind tunnel for further calculations in other files
+   Written by: Clifton-John Walle"""
 
 ####################################################################################################
 
