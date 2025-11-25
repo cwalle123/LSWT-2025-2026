@@ -1,1 +1,32 @@
-Write TODO list here
+* COLLECT RAW DATA IN ORDER TO DETERMINE THE FORMATTING
+
+* PROCESS AND SAVE THE RAW DATA TO CSVS FOR EASY FORMATTING AND ACCESS, WHILE KEEPING THE COMPUTATION TIME LOW
+
+* USE THE PROCESSED DATA TO START GENERATING THE EXPIRMENTAL CONTSTANTS AND GRAPHS (TRY TO KEEP THE CODE EFFICIENT AND ORGANIZED)
+
+* PLOT THE DESIRED GRAPHS AND DETERMINE FIGURE CONVENTIONS FOR CLEAR VISUALIZATIONS IN THE REPORT (FIGURE SIZE, AXIS FONT SIZE, ETC.)
+
+* WHEN THE NUMERICAL AND EXPIRMENTAL DATA HAVE BEEN PROCESSED AND GRAPHS HAVE BEEN CONSTRUCTED, COMPARE THEM IN A SEPERATE FILE. SAVE ANY IMPORTANT RESULTS
+
+########################################################################################################################################################
+
+Code conventions: (Feel free to disagree with these and suggest alternatives)
+
+File naming:
+* Start by writing the dimension that the file is dealing with (2D or 3D if applicable)
+* Then indicate wether you are working with EXPIRMENTAL or NUMERICAL data in the file (EXP, or NUM, or ALL)
+* Then indicate what the file will be used for (e.g. Calculationing Pressure Coefficients)
+Example: 2D_EXP_Pressure_Coefficients.py
+
+File formatting:
+* File description (and who the file was written by)
+* File imports (external and internal)
+* Functions
+* Constants and Calculations
+* File running logic (see e.g. Ambient_Conditions.py)
+
+Variable naming:
+* Please just be clear so that others can understand what you are doing.
+
+Functions:
+* Add a description in the function so that others can follow the calculations.
