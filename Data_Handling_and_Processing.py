@@ -1,4 +1,5 @@
-"""This file is used to import, export, and save all revelant data for easy access in other files"""
+"""This file is used to import, export, and save all revelant data for easy access in other files
+   Written by: Clifton-John Walle"""
 
 ####################################################################################################
 

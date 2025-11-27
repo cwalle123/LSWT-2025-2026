@@ -1,7 +1,3 @@
-* COLLECT RAW DATA IN ORDER TO DETERMINE THE FORMATTING
-
-* PROCESS AND SAVE THE RAW DATA TO CSVS FOR EASY FORMATTING AND ACCESS, WHILE KEEPING THE COMPUTATION TIME LOW
-
 * USE THE PROCESSED DATA TO START GENERATING THE EXPIRMENTAL CONTSTANTS AND GRAPHS (TRY TO KEEP THE CODE EFFICIENT AND ORGANIZED)
 
 * PLOT THE DESIRED GRAPHS AND DETERMINE FIGURE CONVENTIONS FOR CLEAR VISUALIZATIONS IN THE REPORT (FIGURE SIZE, AXIS FONT SIZE, ETC.)
@@ -21,6 +17,9 @@ Example: 2D_EXP_Pressure_Coefficients.py
 File formatting:
 * File description (and who the file was written by)
 * File imports (external and internal)
+    IF YOUR FILE IS IN A FOLDER, MAKE SURE TO ADD THESE 2 IMPORT LINES SO THAT IMPORTS WORK:
+        import sys, os
+        sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 * Functions
 * Constants and Calculations
 * File running logic (see e.g. Ambient_Conditions.py)
