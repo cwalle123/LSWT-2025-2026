@@ -7,9 +7,6 @@ import csv
 import re
 import pandas as pd
 
-# Internal imports
-import Ambient_Conditions as AC
-
 ####################################################################################################
 """Functions"""
 

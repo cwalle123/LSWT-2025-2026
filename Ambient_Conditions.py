@@ -6,6 +6,9 @@
 # External imports
 import numpy as np
 
+# Internal imports
+from Data_Handling_and_Processing import load_data
+
 ####################################################################################################
 """Functions"""
 
@@ -206,45 +209,94 @@ def reynolds_number(rho: float, V: float, L: float, mu: float) -> float:
     return (rho * V * L) / mu
 
 ####################################################################################################
-"""Constants"""
+"""Constants and Calculations"""
+
+# ---------------------------
+# Load 2D and 3D datasets
+# ---------------------------
+two_dimensional_data = load_data("2D")
+three_dimensional_data = load_data("3D")
+
+# Constants
+R_air = 287.057  # J/(kg·K)
+gamma_air = 1.4
+chord_length = 0.16  # m
+
+# ================================================================
+# ------------------------ 2D SECTION -----------------------------
+# ================================================================
 
 # Calculate air density using ideal gas law (2 marks)
-R_air = 287.057 # J/(kg·K)
-p_air = 101389 # Pa                                    
-T_air = 273.15 + 23.1 # K                                  
-rho_air = ideal_gas_law(p=p_air, T=T_air) # kg/m^3
+p_air_2d = np.average(two_dimensional_data["P_bar (Pa)"])
+T_air_2d = 273.15 + np.average(two_dimensional_data["T (C)"])
+rho_air_2d = ideal_gas_law(p=p_air_2d, T=T_air_2d)
 
 # Calculate dynamic viscosity of air μ using Sutherland’s law [2] (2 marks)
-mu_air = dynamic_viscosity(T_air) # kg/(m·s)
+mu_air_2d = dynamic_viscosity(T_air_2d)
 
 # Compute reference dynamic pressure q∞ (1 marks)
-Delta_P_b = 190 # Pa                                        TODO: FIND EXPERIMENTALLY   
-q_inf = dynamic_pressure(Delta_P_b) # Pa
+Delta_P_b_2d = np.average(two_dimensional_data["Delta_Pb (Pa)"])
+q_inf_2d = dynamic_pressure(Delta_P_b_2d)
 
 # Compute reference static pressure p∞ and compare it with the measurement in the tunnel (1 marks)
-p_total_inf = 101375 # Pa                                   TODO: FIND EXPERIMENTALLY 
-ref_static_p_inf = p_total_inf - q_inf # Pa
+p_total_inf_2d = p_air_2d
+ref_static_p_inf_2d = p_total_inf_2d - q_inf_2d
 
 # Compute reference free-stream velocity U∞ and the Reynolds number (1 marks)
-gamma_air = 1.4
-v_air= bernoulli(p_total_1=p_total_inf, p2=ref_static_p_inf, rho=rho_air) # m/s
-a_air = np.sqrt(R_air * gamma_air * T_air) # m/s                        
-M_air = v_air / a_air # Mach number
-chord_length = 0.16 # m 
-Re = reynolds_number(rho_air, v_air, chord_length, mu_air)
+v_air_2d = bernoulli(p_total_1=p_total_inf_2d, p2=ref_static_p_inf_2d, rho=rho_air_2d)
+a_air_2d = np.sqrt(R_air * gamma_air * T_air_2d)
+M_air_2d = v_air_2d / a_air_2d
+Re_2d = reynolds_number(rho_air_2d, v_air_2d, chord_length, mu_air_2d)
+
+
+# ================================================================
+# ------------------------ 3D SECTION -----------------------------
+# ================================================================
+
+# Calculate air density using ideal gas law (2 marks)
+p_air_3d = np.average(three_dimensional_data["P_bar (Pa)"])
+T_air_3d = 273.15 + np.average(three_dimensional_data["T (C)"])
+rho_air_3d = ideal_gas_law(p=p_air_3d, T=T_air_3d)
+
+# Calculate dynamic viscosity of air μ using Sutherland’s law [2] (2 marks)
+mu_air_3d = dynamic_viscosity(T_air_3d)
+
+# Compute reference dynamic pressure q∞ (1 marks)
+Delta_P_b_3d = np.average(three_dimensional_data["Delta_Pb (Pa)"])
+q_inf_3d = dynamic_pressure(Delta_P_b_3d)
+
+# Compute reference static pressure p∞ and compare it with the measurement in the tunnel (1 marks)
+p_total_inf_3d = p_air_3d
+ref_static_p_inf_3d = p_total_inf_3d - q_inf_3d
+
+# Compute reference free-stream velocity U∞ and the Reynolds number (1 marks)
+v_air_3d = bernoulli(p_total_1=p_total_inf_3d, p2=ref_static_p_inf_3d, rho=rho_air_3d)
+a_air_3d = np.sqrt(R_air * gamma_air * T_air_3d)
+M_air_3d = v_air_3d / a_air_3d
+Re_3d = reynolds_number(rho_air_3d, v_air_3d, chord_length, mu_air_3d)
 
 ####################################################################################################
 """Run this file"""
 
 def main():
     # --- Print results ---
-    print("\n=== Airflow Calculations ===")
-    print(f"Air density (rho): {rho_air:.4f} kg/m³")
-    print(f"Dynamic viscosity (mu): {mu_air:.6e} kg/(m·s)")
-    print(f"Reference dynamic pressure (q∞): {q_inf:.4f} Pa")
-    print(f"Free-stream velocity (U∞): {v_air:.4f} m/s")
-    print(f"Reynolds number (Re): {Re:.2e}")
-    print("============================\n")
+    print("\n================= Airflow Calculations =================")
+
+    print("\n--- 2D Airfoil Results ---")
+    print(f"Air density (rho):            {rho_air_2d:.4f} kg/m³")
+    print(f"Dynamic viscosity (mu):       {mu_air_2d:.6e} kg/(m·s)")
+    print(f"Reference dynamic pressure:   {q_inf_2d:.4f} Pa")
+    print(f"Free-stream velocity (U∞):    {v_air_2d:.4f} m/s")
+    print(f"Reynolds number (Re):         {Re_2d:.2e}")
+
+    print("\n--- 3D Wing Results ---")
+    print(f"Air density (rho):            {rho_air_3d:.4f} kg/m³")
+    print(f"Dynamic viscosity (mu):       {mu_air_3d:.6e} kg/(m·s)")
+    print(f"Reference dynamic pressure:   {q_inf_3d:.4f} Pa")
+    print(f"Free-stream velocity (U∞):    {v_air_3d:.4f} m/s")
+    print(f"Reynolds number (Re):         {Re_3d:.2e}")
+
+    print("\n========================================================\n")
 
 if __name__ == "__main__":
     main() # makes sure this only runs if you run *this* file, not if this file is imported somewhere else
