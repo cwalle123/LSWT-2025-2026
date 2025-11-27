@@ -218,11 +218,11 @@ rho_air = ideal_gas_law(p=p_air, T=T_air) # kg/m^3
 mu_air = dynamic_viscosity(T_air) # kg/(m·s)
 
 # Compute reference dynamic pressure q∞ (1 marks)
-Delta_P_b = 62.7 # Pa                                      TODO: FIND EXPERIMENTALLY   
+Delta_P_b = 190 # Pa                                        TODO: FIND EXPERIMENTALLY   
 q_inf = dynamic_pressure(Delta_P_b) # Pa
 
 # Compute reference static pressure p∞ and compare it with the measurement in the tunnel (1 marks)
-p_total_inf = 101375 # Pa                               TODO: FIND EXPERIMENTALLY 
+p_total_inf = 101375 # Pa                                   TODO: FIND EXPERIMENTALLY 
 ref_static_p_inf = p_total_inf - q_inf # Pa
 
 # Compute reference free-stream velocity U∞ and the Reynolds number (1 marks)
