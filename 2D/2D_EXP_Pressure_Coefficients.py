@@ -15,14 +15,38 @@ from Ambient_Conditions import q_inf_2d, p_air_2d, two_dimensional_data
 ####################################################################################################
 """Functions"""
 
-def compute_cp_for_row(row_index):
+def angle_of_attack_to_row(aoa):
     """
-    Compute pressure coefficients (Cp) for all P### (Pa) columns in a specific row.
+    This function uses an angle of attack and finds the row that contains the data of that angle of attack.
     
     Returns:
-        cp_values: numpy array of Cp values, sorted by tap number
+        The row that contains the data for the given angle of attack
     """
+
+    if -3 <= aoa < 12: # WITH STEP SIZE 1.0 DEG
+        if aoa % 1 != 0:
+            raise ValueError('If you are providing an angle of attack in the range of -3 and 12, please provide an integer')
+        row = aoa + 3
+    elif 12 <= aoa <= 18: # WITH STEP SIZE 0.5 DEG
+        if aoa % 0.5 != 0:
+            raise ValueError('If you are providing an angle of attack in the range of 12 and 18, please provide an integer followed by .0 or .5')
+        row = int(2 * aoa - 9)
+    else:
+        raise ValueError('Please provide an angle of attack in the range of -3 and 18')
+
+    # print(row)
+    return row
+
+def compute_cp_for_row(aoa):
+    """
+    Compute pressure coefficients (Cp) for all P### (Pa) columns for a specific angle of attack.
+    
+    Returns:
+        cp_values: numpy array of Cp values
+    """
+
     # Extract row
+    row_index = angle_of_attack_to_row(aoa)
     row = two_dimensional_data.iloc[row_index]
 
     # Identify all pressure tap columns (P001 (Pa) ... P113 (Pa))
@@ -37,13 +61,13 @@ def compute_cp_for_row(row_index):
 
     return cp_values
 
-def plot_all_cp(row_index):
+def plot_all_cp(aoa):
     """
     Plot all Cp values against a normalized chord axis (0 → 1)
-    without splitting into upper/lower surfaces.
     """
 
     # Extract row
+    row_index = angle_of_attack_to_row(aoa)
     row = two_dimensional_data.iloc[row_index]
 
     # Identify all pressure tap columns (P001 (Pa) ... P113 (Pa))
@@ -70,16 +94,13 @@ def plot_all_cp(row_index):
     plt.xlim(0, 1)
     plt.show()
 
-def plot_cp_distribution(row_index):
+def plot_cp_distribution(aoa):
     """
-    Plot Cp distribution along the chord for a given row.
-    Assumes Cp array is ordered such that:
-      - first half = upper surface taps (LE → TE)
-      - second half = lower surface taps (TE → LE)
+    Plot Cp distribution along the chord for a given angle of attack.
     """
 
     # Compute Cp array
-    cp_values = compute_cp_for_row(row_index)
+    cp_values = compute_cp_for_row(aoa)
 
     # Split into upper and lower arrays
     cp_upper = cp_values[0:25]
@@ -114,7 +135,7 @@ def plot_cp_distribution(row_index):
 
     plt.xlabel("x / c")
     plt.ylabel("Cp")
-    plt.title(f"Pressure Coefficient Distribution (Row {row_index})")
+    plt.title(f"Pressure Coefficient Distribution (Angle of attack of {aoa} degrees)")
     plt.xlim(-0.001, 1)
     plt.ylim(1, -1.6)
     plt.xticks(np.arange(0, 1.01, 0.05))
@@ -130,14 +151,8 @@ def plot_cp_distribution(row_index):
 """Run this file"""
 
 def main():
-    aoa = 4
-
-    if -3 <= aoa < 12: # WITH STEP SIZE 1.0 DEG
-        row = aoa + 3
-    elif 12 <= aoa <= 18: # WITH STEP SIZE 0.5 DEG
-        row = 2 * aoa - 9
-
-    plot_cp_distribution(row)
+    aoa = 5
+    plot_cp_distribution(aoa)
 
 if __name__ == "__main__":
     main() # makes sure this only runs if you run *this* file, not if this file is imported somewhere else
