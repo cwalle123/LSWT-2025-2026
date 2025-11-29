@@ -65,6 +65,28 @@ def load_data(dimension: str):
     df = pd.read_csv(csv_path)
     return df
 
+def angle_of_attack_to_row(aoa):
+    """
+    This function uses an angle of attack and finds the row that contains the data of that angle of attack.
+    
+    Returns:
+        The row that contains the data for the given angle of attack
+    """
+
+    if -3 <= aoa < 12: # WITH STEP SIZE 1.0 DEG
+        if aoa % 1 != 0:
+            raise ValueError('If you are providing an angle of attack in the range of -3 and 12, please provide an integer')
+        row = aoa + 3
+    elif 12 <= aoa <= 18: # WITH STEP SIZE 0.5 DEG
+        if aoa % 0.5 != 0:
+            raise ValueError('If you are providing an angle of attack in the range of 12 and 18, please provide an integer followed by .0 or .5')
+        row = int(2 * aoa - 9)
+    else:
+        raise ValueError('Please provide an angle of attack in the range of -3 and 18')
+
+    # print(row)
+    return row
+
 ####################################################################################################
 """Run this file"""
 
