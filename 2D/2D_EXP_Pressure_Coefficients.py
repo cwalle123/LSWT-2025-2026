@@ -15,6 +15,46 @@ from Ambient_Conditions import q_inf_2d, p_air_2d, two_dimensional_data
 ####################################################################################################
 """Functions"""
 
+def pressure_tap_locations(n_points, upper=False):
+    """
+    Generate the required custom x-distribution.
+    If upper=True, inserts 0.375 immediately after passing 0.35.
+    """
+
+    base_x = [0, 0.005, 0.015, 0.04, 0.075, 0.12, 0.16, 0.20]
+
+    x = base_x.copy()
+
+    # Fill remaining points
+    while len(x) < n_points - 1:
+
+        # If upper curve and last point passed 0.35, insert 0.375 once
+        if upper and x[-1] < 0.35:
+            # Compute the next normal point
+            nxt = x[-1] + 0.045
+            if nxt >= 0.35:
+                # Force next to be exactly 0.375
+                x.append(0.375)
+                continue
+
+        # Normal behavior
+        nxt = x[-1] + 0.045
+
+        if nxt >= 0.93:
+            break
+
+        x.append(nxt)
+
+    # If we still need more points and haven't hit 0.93 yet
+    while len(x) < n_points - 1 and x[-1] < 0.93:
+        x.append(0.93)
+
+    # Final point always = 1.0
+    x.append(1.0)
+
+    # Trim or pad (safety)
+    return np.array(x[:n_points])
+
 def angle_of_attack_to_row(aoa):
     """
     This function uses an angle of attack and finds the row that contains the data of that angle of attack.
@@ -37,7 +77,7 @@ def angle_of_attack_to_row(aoa):
     # print(row)
     return row
 
-def compute_cp_for_row(aoa):
+def compute_cp_for_an_aoa(aoa):
     """
     Compute pressure coefficients (Cp) for all P### (Pa) columns for a specific angle of attack.
     
@@ -99,60 +139,78 @@ def plot_cp_distribution(aoa):
     Plot Cp distribution along the chord for a given angle of attack.
     """
 
-    # Compute Cp array
-    cp_values = compute_cp_for_row(aoa)
+    cp_values = compute_cp_for_an_aoa(aoa)
 
-    # Split into upper and lower arrays
     cp_upper = cp_values[0:25]
     cp_lower = cp_values[25:49]
 
-    # Number of points excluding the first
-    n_upper = len(cp_upper) - 1
-    n_lower = len(cp_lower) - 1
+    # Upper uses special 0.375 rule
+    x_upper = pressure_tap_locations(len(cp_upper), upper=True)
 
-    # Create x arrays for points 2 → end (scaled 0 → 1)
-    x_upper = np.linspace(0, 1, n_upper)
-    x_lower = np.linspace(0, 1, n_lower)
-
-    # Prepend first point at the same location as the second point (x = 0)
-    x_upper_adjusted = np.concatenate(([x_upper[0]], x_upper))
-    x_lower_adjusted = np.concatenate(([x_lower[0]], x_lower))
-
-    # Adjust Cp arrays to match lengths
-    cp_upper_adjusted = np.concatenate(([cp_upper[0]], cp_upper[1:]))
-    cp_lower_adjusted = np.concatenate(([cp_lower[0]], cp_lower[1:]))
+    # Lower uses normal rule
+    x_lower = pressure_tap_locations(len(cp_lower), upper=False)
 
     plt.figure(figsize=(10, 5))
 
-    # Plot upper surface
-    plt.plot(x_upper_adjusted, cp_upper_adjusted, marker='o', linestyle='-', color="tab:blue")
+    plt.plot(x_upper, cp_upper, marker='o', linestyle='-', color="tab:blue", label="Upper")
+    plt.plot(x_lower, cp_lower, marker='o', linestyle='-', color="tab:orange", label="Lower")
 
-    # Plot lower surface
-    plt.plot(x_lower_adjusted, cp_lower_adjusted, marker='o', linestyle='-', color="tab:blue")
-
-    # Aerodynamic Cp convention (inverted y-axis)
     plt.gca().invert_yaxis()
-
     plt.xlabel("x / c")
     plt.ylabel("Cp")
-    plt.title(f"Pressure Coefficient Distribution (Angle of attack of {aoa} degrees)")
-    plt.xlim(-0.001, 1)
-    plt.ylim(1, -1.6)
+    plt.title(f"Cp Distribution (AoA = {aoa}°)")
     plt.xticks(np.arange(0, 1.01, 0.05))
-    plt.yticks(np.arange(-1.6, 1, 0.1))
     plt.grid(True)
-    # plt.legend()
+    plt.legend()
     plt.show()
 
-####################################################################################################
-"""Constants and Calculations"""
+def plot_multiple_cp_distributions(aoa_list):
+    """
+    Plot Cp distributions for multiple angles of attack on one figure.
+    """
+
+    plt.figure(figsize=(12, 6))
+
+    for aoa in aoa_list:
+
+        # Compute Cp
+        cp_values = compute_cp_for_an_aoa(aoa)
+
+        # Split upper/lower
+        cp_upper = cp_values[0:25]
+        cp_lower = cp_values[25:49]
+
+        # Apply spacing rules
+        x_upper = pressure_tap_locations(len(cp_upper), upper=True)
+        x_lower = pressure_tap_locations(len(cp_lower), upper=False)
+
+        # Plot upper & lower as one combined curve per AoA
+        # (Airfoil convention: plot upper first, then lower)
+        x_total = np.concatenate((x_upper, x_lower[::-1]))
+        cp_total = np.concatenate((cp_upper, cp_lower[::-1]))
+
+        plt.plot(x_total, cp_total, marker='o', linestyle='-',
+                 label=f"AoA {aoa}°")
+
+    # Formatting
+    plt.gca().invert_yaxis()
+    plt.xlabel("x / c")
+    plt.ylabel("Cp")
+    plt.title("Pressure Coefficient Distribution for Multiple AoA Values")
+    plt.xticks(np.arange(0, 1.01, 0.05))
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
 ####################################################################################################
 """Run this file"""
 
 def main():
-    aoa = 5
-    plot_cp_distribution(aoa)
+    # aoa = 7
+    # plot_all_cp(aoa)
+    # plot_cp_distribution(aoa)
+    plot_multiple_cp_distributions([-1, 3, 7])
 
 if __name__ == "__main__":
     main() # makes sure this only runs if you run *this* file, not if this file is imported somewhere else
