@@ -38,15 +38,9 @@ def compute_wake_velocity(aoa):
     cp_wake = np.array([row[c] / q_inf_2d for c in wake_cols])
 
     if np.any(cp_wake > 1):
-        print("\nSome values of Cp in the wake are more than 1. \nHere it is not possible to compute the velocity, which indicates the limits of neglecting viscosity\n")
+        print("\nSome values of Cp in the wake are more than 1. \nHere it is not possible to compute the velocity, which indicates the limits of neglecting viscosity and not having tunnel corrections\n")
 
     v_wake = v_air_2d * np.sqrt(1 - cp_wake)
-
-    # Trim list lengths if needed
-    n = min(len(cp_wake), len(wake_positions_mm))
-    cp_wake = cp_wake[:n]
-    v_wake = v_wake[:n]
-    wake_positions_mm = wake_positions_mm[:n]
 
     return wake_positions_mm, v_wake, cp_wake
 
