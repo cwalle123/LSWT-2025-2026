@@ -66,6 +66,67 @@ def load_data(dimension: str):
     df = pd.read_csv(csv_path)
     return df
 
+def load_airfoil_pressure_tap_geometry(csv_path):
+    """
+    Load and process airfoil pressure tap geometry based on known structure:
+        - P001 → P025: upper surface (x,y from 0→100)
+        - P026 → P049: lower surface (x,y from 0→100)
+      x and y are given in percent of chord.
+
+    Returns a dictionary with:
+        tap_names
+        tap_x
+        tap_y
+        upper_mask
+        lower_mask
+        tap_names_upper
+        tap_names_lower
+        tap_x_upper
+        tap_x_lower
+        upper_sorted_idx
+        lower_sorted_idx
+    """
+
+    # Load CSV
+    df = pd.read_csv(csv_path)
+
+    # Extract numeric tap index (001 → 49)
+    tap_index = df["pressure no."].str.extract("(\d+)").astype(int)[0].values
+
+    # Convert x,y percent → 0–1
+    tap_x = df["x [%]"].values.astype(float) / 100.0
+    tap_y = df["y [%]"].values.astype(float) / 100.0
+
+    tap_names = df["pressure no."].values
+
+    # Known structure:
+    upper_mask = tap_index <= 25
+    lower_mask = tap_index > 25
+
+    # Sort each by x (monotonic from 0→1)
+    upper_sorted_idx = np.argsort(tap_x[upper_mask])
+    lower_sorted_idx = np.argsort(tap_x[lower_mask])
+
+    # Pre-sorted arrays
+    tap_names_upper = tap_names[upper_mask][upper_sorted_idx]
+    tap_names_lower = tap_names[lower_mask][lower_sorted_idx]
+
+    tap_x_upper = tap_x[upper_mask][upper_sorted_idx]
+    tap_x_lower = tap_x[lower_mask][lower_sorted_idx]
+
+    return {
+        "tap_names": tap_names,
+        "tap_x": tap_x,
+        "tap_y": tap_y,
+        "upper_mask": upper_mask,
+        "lower_mask": lower_mask,
+        "upper_sorted_idx": upper_sorted_idx,
+        "lower_sorted_idx": lower_sorted_idx,
+        "tap_names_upper": tap_names_upper,
+        "tap_names_lower": tap_names_lower,
+        "tap_x_upper": tap_x_upper,
+        "tap_x_lower": tap_x_lower}
+
 def angle_of_attack_to_row(aoa):
     """
     This function uses an angle of attack and finds the row that contains the data of that angle of attack.
