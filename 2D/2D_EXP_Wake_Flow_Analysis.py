@@ -18,12 +18,12 @@ from Data_Handling_and_Processing import angle_of_attack_to_row
 
 def compute_wake_velocity(aoa):
 
-    # Wake probe positions (mm) WITHOUT 0 and 219
+    # Wake probe positions (mm)
     wake_positions_mm = np.array([
-        12, 21, 27, 33, 39, 45, 51, 57, 63, 69, 72, 75, 78,
+        0, 12, 21, 27, 33, 39, 45, 51, 57, 63, 69, 72, 75, 78,
         81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114,
         117, 120, 123, 126, 129, 132, 135, 138, 141, 144,
-        147, 150, 156, 162, 168, 174, 180, 186, 195, 207])
+        147, 150, 156, 162, 168, 174, 180, 186, 195, 207, 219])
 
     # Shift so it starts at 0 mm
     # wake_positions_mm = wake_positions_mm - wake_positions_mm[0]
@@ -32,7 +32,7 @@ def compute_wake_velocity(aoa):
     row_index = angle_of_attack_to_row(aoa)
     row = two_dimensional_data.iloc[row_index]
 
-    wake_cols = [f"P{str(i).zfill(3)} (Pa)" for i in range(50, 98)]
+    wake_cols = [f"P{str(i).zfill(3)} (Pa)" for i in range(50, 97)]
     wake_cols = [c for c in wake_cols if c in two_dimensional_data.columns]
 
     cp_wake = np.array([row[c] / q_inf_2d for c in wake_cols])
