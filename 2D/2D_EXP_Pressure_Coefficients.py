@@ -6,6 +6,7 @@
 # External imports
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 # Internal imports
 import sys, os
@@ -54,7 +55,7 @@ def plot_all_cp(aoa):
     plt.grid()
     plt.show()
 
-def plot_cp_distribution(aoa):
+def plot_cp_distribution(aoa, make_csv=False):
     cp = compute_cp_for_an_aoa(aoa)
 
     # Separate upper/lower Cp using CSV masks and sort indices
@@ -64,11 +65,10 @@ def plot_cp_distribution(aoa):
     x_upper = tap_x_upper
     x_lower = tap_x_lower
 
+    # Plotting
     plt.figure(figsize=(10, 5))
-
     plt.plot(x_upper, cp_upper, 'o-', label="Upper surface")
     plt.plot(x_lower, cp_lower, 'o-', label="Lower surface")
-
     plt.gca().invert_yaxis()
     plt.xlabel("x / c")
     plt.ylabel("Cp")
@@ -76,6 +76,19 @@ def plot_cp_distribution(aoa):
     plt.grid()
     plt.legend()
     plt.show()
+
+    # Export to CSV if requested
+    if make_csv:
+        data = {
+            "x_upper": x_upper,
+            "Cp_upper": cp_upper,
+            "x_lower": x_lower,
+            "Cp_lower": cp_lower
+        }
+        df = pd.DataFrame(data)
+        filename = f"cp_distribution_aoa_{aoa}.csv"
+        df.to_csv(filename, index=False)
+        print(f"Cp values saved to {filename}")
 
 def plot_multiple_cp_distributions(aoa_list):
     from matplotlib.ticker import MultipleLocator
