@@ -58,7 +58,7 @@ def plot_all_cp(aoa):
 def plot_cp_distribution(aoa, make_csv=False):
     cp = compute_cp_for_an_aoa(aoa)
 
-    # Separate upper/lower Cp using CSV masks and sort indices
+    # Separate upper/lower Cp using masks and sort indices
     cp_upper = cp[upper_mask][upper_sorted_idx]
     cp_lower = cp[lower_mask][lower_sorted_idx]
 
@@ -79,12 +79,22 @@ def plot_cp_distribution(aoa, make_csv=False):
 
     # Export to CSV if requested
     if make_csv:
+        # Find max length
+        max_len = max(len(x_upper), len(x_lower))
+
+        # Pad shorter arrays with NaN
+        x_upper_pad = np.pad(x_upper, (0, max_len - len(x_upper)), constant_values=np.nan)
+        cp_upper_pad = np.pad(cp_upper, (0, max_len - len(cp_upper)), constant_values=np.nan)
+        x_lower_pad = np.pad(x_lower, (0, max_len - len(x_lower)), constant_values=np.nan)
+        cp_lower_pad = np.pad(cp_lower, (0, max_len - len(cp_lower)), constant_values=np.nan)
+
         data = {
-            "x_upper": x_upper,
-            "Cp_upper": cp_upper,
-            "x_lower": x_lower,
-            "Cp_lower": cp_lower
+            "x_upper": x_upper_pad,
+            "Cp_upper": cp_upper_pad,
+            "x_lower": x_lower_pad,
+            "Cp_lower": cp_lower_pad
         }
+
         df = pd.DataFrame(data)
         filename = f"cp_distribution_aoa_{aoa}.csv"
         df.to_csv(filename, index=False)
@@ -134,7 +144,7 @@ def plot_multiple_cp_distributions(aoa_list):
 def main():
     # aoa = 7
     # plot_all_cp(aoa)
-    # plot_cp_distribution(aoa)
+    # plot_cp_distribution(1, True)
     plot_multiple_cp_distributions([-1, 3, 7])
 
 if __name__ == "__main__":
